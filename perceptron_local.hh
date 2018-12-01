@@ -82,6 +82,17 @@ class LocalBP : public BPredUnit
 
     /** Mask to get index bits. */
     unsigned indexMask;
+    
+    
+    /** Updates global history as taken. */
+    inline void updateGlobalHistTaken(ThreadID tid);
+
+    /** Updates global history as not taken. */
+    inline void updateGlobalHistNotTaken(ThreadID tid);
+    
+    /**32 bit rolling history of previous branches*/
+    unsigned globalHistory;
+
 };
 
 #endif // __PERCEPTRON_PRED_HH__
