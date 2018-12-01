@@ -91,7 +91,10 @@ class LocalBP : public BPredUnit
     inline void updateGlobalHistNotTaken(ThreadID tid);
     
     /**32 bit rolling history of previous branches*/
-    unsigned globalHistory;
+    /** Global history register. Contains as much history as specified by
+     *  globalHistoryBits. Actual number of bits used is determined by
+     *  globalHistoryMask and choiceHistoryMask. */
+    std::vector<unsigned> globalHistory;
 
 };
 
