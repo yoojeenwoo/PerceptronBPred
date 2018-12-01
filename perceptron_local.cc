@@ -118,7 +118,7 @@ inline
 bool
 LocalBP::getPrediction(uint8_t &count)
 {
-    // Get the MSB of the count
+    // Round the perceptron output and convert to boolean
     return (count >> (localCtrBits - 1));
 }
 
