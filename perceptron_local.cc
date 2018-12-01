@@ -1,9 +1,10 @@
-#include "cpu/pred/2bit_local.hh"
+#include "cpu/pred/perceptron_local.hh"
 
 #include "base/intmath.hh"
 #include "base/logging.hh"
 #include "base/trace.hh"
 #include "debug/Fetch.hh"
+#include "base/bitfield.hh"
 
 LocalBP::LocalBP(const LocalBPParams *params)
     : BPredUnit(params),
@@ -78,9 +79,11 @@ LocalBP::lookup(ThreadID tid, Addr branch_addr, void * &bp_history)
     if (taken) {
         DPRINTF(Fetch, "Branch updated as taken.\n");
         localCtrs[local_predictor_idx].increment();
+        updateGlobalHistTaken(tid);
     } else {
         DPRINTF(Fetch, "Branch updated as not taken.\n");
         localCtrs[local_predictor_idx].decrement();
+        updateGlobalHistNotTaken(tid);
     }
 #endif
 
@@ -138,4 +141,20 @@ LocalBP*
 LocalBPParams::create()
 {
     return new LocalBP(this);
+}
+
+inline
+void
+LocalBP::updateGlobalHistTaken(ThreadID tid)
+{
+    globalHistory[tid] = (globalHistory[tid] << 1) | 1;
+//    globalHistory[tid] = globalHistory[tid] & historyRegisterMask;
+}
+
+inline
+void
+LocalBP::updateGlobalHistNotTaken(ThreadID tid)
+{
+    globalHistory[tid] = (globalHistory[tid] << 1);
+//    globalHistory[tid] = globalHistory[tid] & historyRegisterMask;
 }
