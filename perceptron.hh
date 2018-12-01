@@ -14,49 +14,52 @@ class Perceptron
     /**
      * Constructor for the perceptron.
      */
-    Perceptron()
-        : initialVal(0), counter(0)
-    { }
+    Perceptron() : N(1)
+    { std::vector<int> weights(N, 0); }
 
     /**
      * Constructor for the perceptron.
-     * @param bits How many bits the counter will have.
+     * @param units How many input neurons the perceptron will have
      */
-    Perceptron(unsigned bits)
-        : initialVal(0), maxVal((1 << bits) - 1), counter(0)
-    { }
+    Perceptron(size_t units)
+        : N(units)
+    { std::vector<int> weights(N, 0); }
 
     /**
-     * Constructor for the counter.
-     * @param bits How many bits the counter will have.
-     * @param initial_val Starting value for each counter.
+     * Constructor for the perceptron.
+     * @param units How many input neurons the perceptron will have
+     * @param initial_w Initial value of each weight
      */
-    Perceptron(unsigned bits, uint8_t initial_val)
-        : initialVal(initial_val), maxVal((1 << bits) - 1),
-          counter(initial_val)
-    {
-        // Check to make sure initial value doesn't exceed the max
-        // counter value.
-        if (initial_val > maxVal) {
-            fatal("BP: Initial counter value exceeds max size.");
-        }
-    }
+    Perceptron(size_t units, int initial_w)
+        : N(units)
+    { std::vector<int> weights(N, initial_w); }
 
     /**
-     * Sets the number of bits.
+     * Sets the number of input neurons
      */
-    void setBits(unsigned bits) { maxVal = (1 << bits) - 1; }
+    void setSize(size_t _N) { N = _N; }
 
     void reset() { counter = initialVal; }
 
     /**
      * Read the counter's value.
      */
-    uint8_t read() const
-    { return counter; }
+    uint8_t read(const BPHistory& hist) const { 
+		int sum = 0;
+		for (size_t i = 0; i < N; ++i) {
+			if ((hist.globalHistory >> i) & 1) {
+				sum += weights[i];
+			} else {
+				sum -= weights[i];
+			}
+		}
+		return sum;
+	}
+	
 
   private:
-	std::vector<int> weights;
+	size_t N; // Size of perceptron
+	std::vector<int> weights; 
     
 };
 
