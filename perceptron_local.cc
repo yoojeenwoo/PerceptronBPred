@@ -60,7 +60,7 @@ bool
 LocalBP::lookup(ThreadID tid, Addr branch_addr, void * &bp_history)
 {
     bool taken;
-    uint8_t counter_val;
+    int counter_val;
     unsigned local_predictor_idx = getLocalIndex(branch_addr);
 
     DPRINTF(Fetch, "Looking up index %#x\n",
@@ -116,10 +116,10 @@ LocalBP::update(ThreadID tid, Addr branch_addr, bool taken, void *bp_history,
 
 inline
 bool
-LocalBP::getPrediction(uint8_t &count)
+LocalBP::getPrediction(int count)
 {
     // Round the perceptron output and convert to boolean
-    return (count >> (localCtrBits - 1));
+    return (count > 0) ? true : false;
 }
 
 inline

@@ -5,7 +5,7 @@
 
 #include "base/types.hh"
 #include "cpu/pred/bpred_unit.hh"
-#include "cpu/pred/sat_counter.hh"
+#include "cpu/pred/perceptron.hh"
 #include "params/LocalBP.hh"
 
 /**
@@ -69,7 +69,7 @@ class LocalBP : public BPredUnit
     inline unsigned getLocalIndex(Addr &PC);
 
     /** Array of counters that make up the local predictor. */
-    std::vector<SatCounter> localCtrs;
+    std::vector<Perceptron> localCtrs;
 
     /** Size of the local predictor. */
     unsigned localPredictorSize;
