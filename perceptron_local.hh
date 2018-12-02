@@ -64,25 +64,18 @@ class LocalBP : public BPredUnit
      *  @return The prediction based on the counter value.
      */
     inline bool getPrediction(uint8_t &count);
+	
+	/** Calculates the local index based on the PC. */
+    inline size_t getLocalIndex(Addr &PC);
 
-    /** Calculates the local index based on the PC. */
-    inline unsigned getLocalIndex(Addr &PC);
-
+    std::vector<Perceptron> localPerceps;
     /** Array of counters that make up the local predictor. */
-    std::vector<Perceptron> localCtrs;
 
-    /** Size of the local predictor. */
-    unsigned localPredictorSize;
-
-    /** Number of sets. */
-    unsigned localPredictorSets;
-
-    /** Number of bits of the local predictor's counters. */
-    unsigned localCtrBits;
-
-    /** Mask to get index bits. */
-    unsigned indexMask;
-    
+    /** Size of the local perceptron. */
+    size_t localPerceptronSize;
+	
+	/** Number of sets. */
+    size_t localPredictorSets;
     
     /** Updates global history as taken. */
     inline void updateGlobalHistTaken(ThreadID tid);
@@ -91,7 +84,7 @@ class LocalBP : public BPredUnit
     inline void updateGlobalHistNotTaken(ThreadID tid);
     
     /**32 bit rolling history of previous branches*/
-    unsigned globalHistory;
+    size_t globalHistory;
 
 };
 

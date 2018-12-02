@@ -14,16 +14,17 @@ class Perceptron
     /**
      * Constructor for the perceptron.
      */
-    Perceptron() : N(1)
-    { std::vector<int> weights(N, 0); }
+    Perceptron() 
+		: N(1), theta(0), last_output(0)
+    { weights = std::vector<int>(N, 0); }
 
     /**
      * Constructor for the perceptron.
      * @param units How many input neurons the perceptron will have
      */
-    Perceptron(size_t units)
-        : N(units)
-    { std::vector<int> weights(N, 0); }
+    Perceptron(size_t units) 
+		: N(units), theta(units/4), last_output(0)
+    { weights = std::vector<int>(N, 0); }
 
     /**
      * Constructor for the perceptron.
@@ -31,35 +32,64 @@ class Perceptron
      * @param initial_w Initial value of each weight
      */
     Perceptron(size_t units, int initial_w)
-        : N(units)
-    { std::vector<int> weights(N, initial_w); }
+        : N(units), theta(units/4), last_output(0)
+    { weights = std::vector<int>(N, initial_w); }
 
+	/**
+     * Constructor for the perceptron.
+     * @param units How many input neurons the perceptron will have
+     * @param initial_w Initial value of each weight
+	 * @param train_threshold
+     */
+	Perceptron(size_t units, int inital_w, size_t train_threshold)
+		: N(units), theta(train_threshold), last_output(0)
+	{ weights = std::vector<int>(N, initial_w); }
+	
     /**
      * Sets the number of input neurons
      */
     void setSize(size_t _N) { N = _N; }
 
-    void reset() { counter = initialVal; }
+    void reset() { weights = std::vector<int>(N, 0); }
 
     /**
      * Read the counter's value.
      */
-    uint8_t read(const BPHistory& hist) const { 
-		int sum = 0;
+    uint8_t read(size_t globalHistory) const { 
+		last_output = weights[0];
+		last_input = globalHistory;
 		for (size_t i = 0; i < N; ++i) {
-			if ((hist.globalHistory >> i) & 1) {
-				sum += weights[i];
+			if ((last_input >> i) & 1) {
+				last_output += weights[i+1];
 			} else {
-				sum -= weights[i];
+				last_output -= weights[i+1];
 			}
 		}
-		return sum;
+		return last_output;
+	}
+	
+	/**
+	 * Iteratively train the perceptron
+	 */
+	void train(bool taken) {
+		if (((last_output >= 0) && !taken) || (abs(last_output) <= theta)) {
+			for (size_t i = 0; i < N; ++i) {
+				if (taken) {
+					weights[i] += ((last_input >> i) & 1);
+				} else {
+					weights[i] -= ((last_input << i) & 1);
+				}
+			}
+		}
 	}
 	
 
   private:
 	size_t N; // Size of perceptron
-	std::vector<int> weights; 
+	std::vector<int> weights;
+	size_t theta; // Training Parameter
+	int last_output; // Most recent perceptron output
+	size_t last_input;
     
 };
 
