@@ -5,7 +5,7 @@
 
 #include "base/types.hh"
 #include "cpu/pred/bpred_unit.hh"
-#include "cpu/pred/sat_counter.hh"
+#include "cpu/pred/perceptron.hh"
 #include "params/LocalBP.hh"
 
 /**
@@ -15,13 +15,13 @@
  * predictor state that needs to be recorded or updated; the update can be
  * determined solely by the branch being taken or not taken.
  */
-class LocalBP : public BPredUnit
+class PerceptronLocalBP : public BPredUnit
 {
   public:
     /**
      * Default branch predictor constructor.
      */
-    LocalBP(const LocalBPParams *params);
+    PerceptronLocalBP(const PerceptronLocalBPParams *params);
 
     virtual void uncondBranch(ThreadID tid, Addr pc, void * &bp_history);
 
@@ -64,25 +64,18 @@ class LocalBP : public BPredUnit
      *  @return The prediction based on the counter value.
      */
     inline bool getPrediction(uint8_t &count);
+	
+	/** Calculates the local index based on the PC. */
+    inline size_t getLocalIndex(Addr &PC);
 
-    /** Calculates the local index based on the PC. */
-    inline unsigned getLocalIndex(Addr &PC);
-
+    std::vector<Perceptron> localPerceps;
     /** Array of counters that make up the local predictor. */
-    std::vector<SatCounter> localCtrs;
 
-    /** Size of the local predictor. */
-    unsigned localPredictorSize;
-
-    /** Number of sets. */
-    unsigned localPredictorSets;
-
-    /** Number of bits of the local predictor's counters. */
-    unsigned localCtrBits;
-
-    /** Mask to get index bits. */
-    unsigned indexMask;
-    
+    /** Size of the local perceptron. */
+    size_t localPerceptronSize;
+	
+	/** Number of sets. */
+    size_t localPredictorSets;
     
     /** Updates global history as taken. */
     inline void updateGlobalHistTaken(ThreadID tid);
@@ -91,10 +84,14 @@ class LocalBP : public BPredUnit
     inline void updateGlobalHistNotTaken(ThreadID tid);
     
     /**32 bit rolling history of previous branches*/
+<<<<<<< HEAD
     /** Global history register. Contains as much history as specified by
      *  globalHistoryBits. Actual number of bits used is determined by
      *  globalHistoryMask and choiceHistoryMask. */
     std::vector<unsigned> globalHistory;
+=======
+    size_t globalHistory;
+>>>>>>> ffaa11445de883e659a75a3ff6dbd342c006b558
 
 };
 

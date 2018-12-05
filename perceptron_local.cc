@@ -6,51 +6,41 @@
 #include "debug/Fetch.hh"
 #include "base/bitfield.hh"
 
-LocalBP::LocalBP(const LocalBPParams *params)
+PerceptronLocalBP::PerceptronLocalBP(const PerceptronLocalBPParams *params)
     : BPredUnit(params),
-      localPredictorSize(params->localPredictorSize),
-      localCtrBits(params->localCtrBits)
+      localPerceptronSize(params->localPercepSize),
+	  localPredictorSets(params->localPredictorSize)
 {
-    if (!isPowerOf2(localPredictorSize)) {
-        fatal("Invalid local predictor size!\n");
-    }
 
-    localPredictorSets = localPredictorSize / localCtrBits;
+	// Setup the index mask.
+	indexMask = localPredictorSets - 1;
+	
+	DPRINTF(Fetch, "index mask: %#x\n", indexMask);
 
-    if (!isPowerOf2(localPredictorSets)) {
-        fatal("Invalid number of local predictor sets! Check localCtrBits.\n");
-    }
+	//Setup the array of perceptrons for the local predictor
+	localPerceps.resize(localPredictorSets);
+	
+    for (size_t i = 0; i < localPredictorSets; ++i) {
+		localPerceps[i].setSize(localPerceptronSize);
+	}
+	
+	DPRINTF(Fetch, "local predictor sets: %i\n", localPredictorSets);
 
-    // Setup the index mask.
-    indexMask = localPredictorSets - 1;
-
-    DPRINTF(Fetch, "index mask: %#x\n", indexMask);
-
-    // Setup the array of counters for the local predictor.
-    localCtrs.resize(localPredictorSets);
-
-    for (unsigned i = 0; i < localPredictorSets; ++i)
-        localCtrs[i].setBits(localCtrBits);
-
-    DPRINTF(Fetch, "local predictor size: %i\n",
-            localPredictorSize);
-
-    DPRINTF(Fetch, "local counter bits: %i\n", localCtrBits);
-
-    DPRINTF(Fetch, "instruction shift amount: %i\n",
-            instShiftAmt);
+    DPRINTF(Fetch, "local perceptron size: %i\n",
+            localPerceptronSize);
+			
 }
 
 void
-LocalBP::reset()
+PerceptronLocalBP::reset()
 {
-    for (unsigned i = 0; i < localPredictorSets; ++i) {
-        localCtrs[i].reset();
+    for (size_t i = 0; i < localPredictorSets; ++i) {
+        localPerceps[i].reset();
     }
 }
 
 void
-LocalBP::btbUpdate(ThreadID tid, Addr branch_addr, void * &bp_history)
+PerceptronLocalBP::btbUpdate(ThreadID tid, Addr branch_addr, void * &bp_history)
 {
 // Place holder for a function that is called to update predictor history when
 // a BTB entry is invalid or not found.
@@ -58,19 +48,19 @@ LocalBP::btbUpdate(ThreadID tid, Addr branch_addr, void * &bp_history)
 
 
 bool
-LocalBP::lookup(ThreadID tid, Addr branch_addr, void * &bp_history)
+PerceptronLocalBP::lookup(ThreadID tid, Addr branch_addr, void * &bp_history)
 {
     bool taken;
-    uint8_t counter_val;
-    unsigned local_predictor_idx = getLocalIndex(branch_addr);
+    int counter_val;
+    size_t local_predictor_idx = getLocalIndex(branch_addr);
 
     DPRINTF(Fetch, "Looking up index %#x\n",
             local_predictor_idx);
 
-    counter_val = localCtrs[local_predictor_idx].read();
+    counter_val = localPerceps[local_predictor_idx].read(globalHistory);
 
     DPRINTF(Fetch, "prediction is %i.\n",
-            (int)counter_val);
+            counter_val);
 
     taken = getPrediction(counter_val);
 
@@ -78,11 +68,17 @@ LocalBP::lookup(ThreadID tid, Addr branch_addr, void * &bp_history)
     // Speculative update.
     if (taken) {
         DPRINTF(Fetch, "Branch updated as taken.\n");
+<<<<<<< HEAD
         localCtrs[local_predictor_idx].increment();
         updateGlobalHistTaken(tid);
     } else {
         DPRINTF(Fetch, "Branch updated as not taken.\n");
         localCtrs[local_predictor_idx].decrement();
+=======
+        updateGlobalHistTaken(tid);
+    } else {
+        DPRINTF(Fetch, "Branch updated as not taken.\n");
+>>>>>>> ffaa11445de883e659a75a3ff6dbd342c006b558
         updateGlobalHistNotTaken(tid);
     }
 #endif
@@ -91,11 +87,11 @@ LocalBP::lookup(ThreadID tid, Addr branch_addr, void * &bp_history)
 }
 
 void
-LocalBP::update(ThreadID tid, Addr branch_addr, bool taken, void *bp_history,
+PerceptronLocalBP::update(ThreadID tid, Addr branch_addr, bool taken, void *bp_history,
                 bool squashed)
 {
     assert(bp_history == NULL);
-    unsigned local_predictor_idx;
+    size_t local_predictor_idx;
 
     // No state to restore, and we do not update on the wrong
     // path.
@@ -107,45 +103,47 @@ LocalBP::update(ThreadID tid, Addr branch_addr, bool taken, void *bp_history,
     local_predictor_idx = getLocalIndex(branch_addr);
 
     DPRINTF(Fetch, "Looking up index %#x\n", local_predictor_idx);
+	
+	localPerceps[local_predictor_idx].train(taken);
 
     if (taken) {
         DPRINTF(Fetch, "Branch updated as taken.\n");
-        localCtrs[local_predictor_idx].increment();
+        updateGlobalHistTaken(tid);
     } else {
         DPRINTF(Fetch, "Branch updated as not taken.\n");
-        localCtrs[local_predictor_idx].decrement();
+        updateGlobalHistNotTaken(tid);
     }
 }
 
 inline
 bool
-LocalBP::getPrediction(uint8_t &count)
+PerceptronLocalBP::getPrediction(int count)
 {
     // Round the perceptron output and convert to boolean
-    return (count >> (localCtrBits - 1));
+    return (count > 0) ? true : false;
 }
 
 inline
-unsigned
-LocalBP::getLocalIndex(Addr &branch_addr)
+size_t
+PerceptronLocalBP::getLocalIndex(Addr &branch_addr)
 {
     return (branch_addr >> instShiftAmt) & indexMask;
 }
 
 void
-LocalBP::uncondBranch(ThreadID tid, Addr pc, void *&bp_history)
+PerceptronLocalBP::uncondBranch(ThreadID tid, Addr pc, void *&bp_history)
 {
 }
 
-LocalBP*
-LocalBPParams::create()
+PerceptronLocalBP*
+PerceptronLocalBPParams::create()
 {
-    return new LocalBP(this);
+    return new PerceptronLocalBP(this);
 }
 
 inline
 void
-LocalBP::updateGlobalHistTaken(ThreadID tid)
+PerceptronLocalBP::updateGlobalHistTaken(ThreadID tid)
 {
     globalHistory[tid] = (globalHistory[tid] << 1) | 1;
 //    globalHistory[tid] = globalHistory[tid] & historyRegisterMask;
@@ -153,7 +151,7 @@ LocalBP::updateGlobalHistTaken(ThreadID tid)
 
 inline
 void
-LocalBP::updateGlobalHistNotTaken(ThreadID tid)
+PerceptronLocalBP::updateGlobalHistNotTaken(ThreadID tid)
 {
     globalHistory[tid] = (globalHistory[tid] << 1);
 //    globalHistory[tid] = globalHistory[tid] & historyRegisterMask;
