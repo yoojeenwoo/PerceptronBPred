@@ -68,17 +68,9 @@ PerceptronLocalBP::lookup(ThreadID tid, Addr branch_addr, void * &bp_history)
     // Speculative update.
     if (taken) {
         DPRINTF(Fetch, "Branch updated as taken.\n");
-<<<<<<< HEAD
-        localCtrs[local_predictor_idx].increment();
         updateGlobalHistTaken(tid);
     } else {
         DPRINTF(Fetch, "Branch updated as not taken.\n");
-        localCtrs[local_predictor_idx].decrement();
-=======
-        updateGlobalHistTaken(tid);
-    } else {
-        DPRINTF(Fetch, "Branch updated as not taken.\n");
->>>>>>> ffaa11445de883e659a75a3ff6dbd342c006b558
         updateGlobalHistNotTaken(tid);
     }
 #endif

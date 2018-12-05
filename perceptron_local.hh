@@ -6,7 +6,7 @@
 #include "base/types.hh"
 #include "cpu/pred/bpred_unit.hh"
 #include "cpu/pred/perceptron.hh"
-#include "params/LocalBP.hh"
+#include "params/PerceptronLocalBP.hh"
 
 /**
  * Implements a local predictor that uses the PC to index into a table of
