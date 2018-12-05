@@ -41,7 +41,7 @@ class Perceptron
      * @param initial_w Initial value of each weight
 	 * @param train_threshold
      */
-	Perceptron(size_t units, int inital_w, size_t train_threshold)
+	Perceptron(size_t units, int initial_w, size_t train_threshold)
 		: N(units), theta(train_threshold), last_output(0)
 	{ weights = std::vector<int>(N, initial_w); }
 	
@@ -55,7 +55,7 @@ class Perceptron
     /**
      * Read the counter's value.
      */
-    uint8_t read(size_t globalHistory) const { 
+    uint8_t read(size_t globalHistory) { 
 		last_output = weights[0];
 		last_input = globalHistory;
 		for (size_t i = 0; i < N; ++i) {

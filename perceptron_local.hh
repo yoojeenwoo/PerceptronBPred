@@ -84,14 +84,7 @@ class PerceptronLocalBP : public BPredUnit
     inline void updateGlobalHistNotTaken(ThreadID tid);
     
     /**32 bit rolling history of previous branches*/
-<<<<<<< HEAD
-    /** Global history register. Contains as much history as specified by
-     *  globalHistoryBits. Actual number of bits used is determined by
-     *  globalHistoryMask and choiceHistoryMask. */
-    std::vector<unsigned> globalHistory;
-=======
     size_t globalHistory;
->>>>>>> ffaa11445de883e659a75a3ff6dbd342c006b558
 
 };
 

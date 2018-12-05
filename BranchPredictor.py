@@ -67,7 +67,7 @@ class PerceptronLocalBP(BranchPredictor):
     cxx_header = "cpu/pred/perceptron_local.hh"
 
     localPredictorSize = Param.Unsigned(2048, "Size of local predictor")
-    localCtrBits = Param.Unsigned(2, "Bits per counter")
+    localPercepSize = Param.Unsigned(2, "Bits per counter")
 
 class TournamentBP(BranchPredictor):
     type = 'TournamentBP'
