@@ -107,21 +107,6 @@ PerceptronLocalBP::update(ThreadID tid, Addr branch_addr, bool taken, void *bp_h
     }
 }
 
-inline
-bool
-PerceptronLocalBP::getPrediction(int count)
-{
-    // Round the perceptron output and convert to boolean
-    return (count > 0) ? true : false;
-}
-
-inline
-size_t
-PerceptronLocalBP::getLocalIndex(Addr &branch_addr)
-{
-    return (branch_addr >> instShiftAmt) & indexMask;
-}
-
 void
 PerceptronLocalBP::uncondBranch(ThreadID tid, Addr pc, void *&bp_history)
 {
@@ -137,7 +122,7 @@ inline
 void
 PerceptronLocalBP::updateGlobalHistTaken(ThreadID tid)
 {
-    globalHistory[tid] = (globalHistory[tid] << 1) | 1;
+    globalHistory = (globalHistory << 1) | 1;
 //    globalHistory[tid] = globalHistory[tid] & historyRegisterMask;
 }
 
@@ -145,6 +130,6 @@ inline
 void
 PerceptronLocalBP::updateGlobalHistNotTaken(ThreadID tid)
 {
-    globalHistory[tid] = (globalHistory[tid] << 1);
+    globalHistory = (globalHistory << 1);
 //    globalHistory[tid] = globalHistory[tid] & historyRegisterMask;
 }

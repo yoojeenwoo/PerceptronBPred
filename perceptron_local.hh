@@ -88,4 +88,20 @@ class PerceptronLocalBP : public BPredUnit
 
 };
 
+inline
+bool
+PerceptronLocalBP::getPrediction(int count)
+{
+    // Round the perceptron output and convert to boolean
+    return (count > 0) ? true : false;
+}
+
+inline
+size_t
+PerceptronLocalBP::getLocalIndex(Addr &branch_addr)
+{
+    return (branch_addr >> instShiftAmt) & indexMask;
+}
+
+
 #endif // __PERCEPTRON_PRED_HH__
