@@ -63,10 +63,10 @@ class PerceptronLocalBP : public BPredUnit
      *  @param count The value of the counter.
      *  @return The prediction based on the counter value.
      */
-    inline bool getPrediction(uint8_t &count);
+    bool getPrediction(int count);
 	
 	/** Calculates the local index based on the PC. */
-    inline size_t getLocalIndex(Addr &PC);
+    size_t getLocalIndex(Addr &branch_addr);
 
     std::vector<Perceptron> localPerceps;
     /** Array of counters that make up the local predictor. */
@@ -78,30 +78,18 @@ class PerceptronLocalBP : public BPredUnit
     size_t localPredictorSets;
     
     /** Updates global history as taken. */
-    inline void updateGlobalHistTaken(ThreadID tid);
+    void updateGlobalHistTaken(ThreadID tid);
 
     /** Updates global history as not taken. */
-    inline void updateGlobalHistNotTaken(ThreadID tid);
+    void updateGlobalHistNotTaken(ThreadID tid);
     
     /**32 bit rolling history of previous branches*/
     size_t globalHistory;
+	
+	/** Mask to get index bits. */
+	size_t indexMask;
 
 };
-
-inline
-bool
-PerceptronLocalBP::getPrediction(int count)
-{
-    // Round the perceptron output and convert to boolean
-    return (count > 0) ? true : false;
-}
-
-inline
-size_t
-PerceptronLocalBP::getLocalIndex(Addr &branch_addr)
-{
-    return (branch_addr >> instShiftAmt) & indexMask;
-}
 
 
 #endif // __PERCEPTRON_PRED_HH__

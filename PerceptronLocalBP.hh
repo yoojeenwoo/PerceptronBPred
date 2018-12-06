@@ -14,8 +14,8 @@ struct PerceptronLocalBPParams
     : public BranchPredictorParams
 {
     PerceptronLocalBP * create();
-    unsigned localPercepSize;
-    unsigned localPredictorSize;
+    size_t localPercepSize;
+    size_t localPredictorSize;
 };
 
 #endif // __PARAMS__PerceptronLocalBP__

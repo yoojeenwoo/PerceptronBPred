@@ -118,7 +118,19 @@ PerceptronLocalBPParams::create()
     return new PerceptronLocalBP(this);
 }
 
-inline
+bool
+PerceptronLocalBP::getPrediction(int count)
+{
+    // Round the perceptron output and convert to boolean
+    return (count > 0) ? true : false;
+}
+
+size_t
+PerceptronLocalBP::getLocalIndex(Addr &branch_addr)
+{
+    return (branch_addr >> instShiftAmt) & indexMask;
+}
+
 void
 PerceptronLocalBP::updateGlobalHistTaken(ThreadID tid)
 {
@@ -126,7 +138,6 @@ PerceptronLocalBP::updateGlobalHistTaken(ThreadID tid)
 //    globalHistory[tid] = globalHistory[tid] & historyRegisterMask;
 }
 
-inline
 void
 PerceptronLocalBP::updateGlobalHistNotTaken(ThreadID tid)
 {
