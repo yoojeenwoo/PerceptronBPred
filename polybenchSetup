@@ -1,0 +1,32 @@
+#!/bin/bash
+
+# README
+# Be inside polybench-c-3.2 before running
+# add polybench.h and polybench.c to polybench-c-3.2 before running
+# after first run comment out all mv instructions
+
+# Putting all testbenches into big folder 
+mv medley/* .
+mv linear-algebra/* .
+mv kernels/* .
+mv solvers/* .
+mv datamining/* .
+mv stencils/* .
+
+rm -r medley
+rm -r linear-algebra
+rm -r datamining
+rm -r stencils
+rm -r kernels
+rm -r solvers
+
+NAME=yoojeen
+
+# Linear Algebra Compilation
+for d in */; do
+    if [ $d = "utilities/" ]
+    then
+	continue
+    fi	
+    gcc -I utilities -I $d utilities/polybench.c $d${d:0:${#string}-1}.c -o $d${d:0:${#string}-1}
+done 
