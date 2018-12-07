@@ -202,7 +202,6 @@ if options.elastic_trace_en:
 # frequency.
 for cpu in system.cpu:
     cpu.clk_domain = system.cpu_clk_domain
-    cpu.branchPred = PerceptronLocalBP()
 
 if CpuConfig.is_kvm_cpu(CPUClass) or CpuConfig.is_kvm_cpu(FutureClass):
     if buildEnv['TARGET_ISA'] == 'x86':
@@ -266,10 +265,7 @@ else:
     CacheConfig.config_cache(options, system)
     MemConfig.config_mem(options, system)
     for i in xrange(np):
-        system.cpu[i].dcache.tag_latency = 1
-        system.cpu[i].dcache.assoc = 8
-        system.cpu[i].dcache.tags = LIP()
-        # system.cpu[i].dcache.replacement_policy = RandomRP()
+		cpu.branchPred = PerceptronLocalBP()
 
 root = Root(full_system = False, system = system)
 Simulation.run(options, root, system, FutureClass)
