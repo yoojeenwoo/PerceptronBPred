@@ -5,20 +5,14 @@
 # add polybench.h and polybench.c to polybench-c-3.2 before running
 # after first run comment out all mv instructions
 
-# Putting all testbenches into big folder 
-mv medley/* .
-mv linear-algebra/* .
-mv kernels/* .
-mv solvers/* .
-mv datamining/* .
-mv stencils/* .
+# Putting all testbenches into big folder
+declare -a arr=("medley" "linear-algebra" "kernels" "solvers" "datamining" "stencils")
 
-rm -r medley
-rm -r linear-algebra
-rm -r datamining
-rm -r stencils
-rm -r kernels
-rm -r solvers
+for i in "${arr[@]}"
+do
+    mv $i/* .
+    rm -r $i
+done
 
 NAME=yoojeen
 
