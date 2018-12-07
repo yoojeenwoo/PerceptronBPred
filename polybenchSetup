@@ -28,5 +28,5 @@ for d in */; do
     then
 	continue
     fi	
-    gcc -I utilities -I $d utilities/polybench.c $d${d:0:${#string}-1}.c -o $d${d:0:${#string}-1}
+    gcc -I utilities -lm -I $d utilities/polybench.c $d${d:0:${#string}-1}.c -o $d${d:0:${#string}-1}
 done 
