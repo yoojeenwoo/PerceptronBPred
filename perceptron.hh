@@ -15,7 +15,7 @@ class Perceptron
      * Constructor for the perceptron.
      */
     Perceptron() 
-		: N(1), theta(0), last_output(0)
+		: N(1), theta(15), last_output(0)
     { weights = std::vector<int>(N, 0); }
 
     /**
@@ -23,7 +23,7 @@ class Perceptron
      * @param units How many input neurons the perceptron will have
      */
     Perceptron(size_t units) 
-		: N(units), theta(units/4), last_output(0)
+		: N(units), theta(1.93*units + 14), last_output(0)
     { weights = std::vector<int>(N, 0); }
 
     /**
@@ -32,7 +32,7 @@ class Perceptron
      * @param initial_w Initial value of each weight
      */
     Perceptron(size_t units, int initial_w)
-        : N(units), theta(units/4), last_output(0)
+        : N(units), theta(1.93*units + 14), last_output(0)
     { weights = std::vector<int>(N, initial_w); }
 
 	/**
@@ -48,7 +48,10 @@ class Perceptron
     /**
      * Sets the number of input neurons
      */
-    void setSize(size_t _N) { N = _N; }
+    void setSize(size_t _N) {
+      N = _N;
+      theta = 1.93*N + 14;
+    }
 
     void reset() { weights = std::vector<int>(N, 0); }
 
