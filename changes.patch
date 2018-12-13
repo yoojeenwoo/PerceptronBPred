@@ -1,0 +1,30 @@
+diff --git a/src/cpu/pred/BranchPredictor.py b/src/cpu/pred/BranchPredictor.py
+index 1b400c2..5b123df 100644
+--- a/src/cpu/pred/BranchPredictor.py
++++ b/src/cpu/pred/BranchPredictor.py
+@@ -61,6 +61,13 @@ class LocalBP(BranchPredictor):
+     localPredictorSize = Param.Unsigned(2048, "Size of local predictor")
+     localCtrBits = Param.Unsigned(2, "Bits per counter")
+ 
++class PerceptronLocalBP(BranchPredictor):
++    type = 'PerceptronLocalBP'
++    cxx_class = 'PerceptronLocalBP'
++    cxx_header = "cpu/pred/perceptron_local.hh"
++
++    localPredictorSize = Param.Unsigned(2048, "Size of local predictor")
++    localPercepSize = Param.Unsigned(64, "Bits per counter")
+ 
+ class TournamentBP(BranchPredictor):
+     type = 'TournamentBP'
+diff --git a/src/cpu/pred/SConscript b/src/cpu/pred/SConscript
+index 1cdf7bb..f8f54bf 100644
+--- a/src/cpu/pred/SConscript
++++ b/src/cpu/pred/SConscript
+@@ -44,6 +44,7 @@ Source('ras.cc')
+ Source('tournament.cc')
+ Source ('bi_mode.cc')
+ Source('ltage.cc')
++Source('perceptron_local.cc')
+ DebugFlag('FreeList')
+ DebugFlag('Branch')
+ DebugFlag('LTage')
